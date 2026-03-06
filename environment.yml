@@ -1,0 +1,26 @@
+name: Yapo_autos
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - typer
+  - loguru
+  - tqdm
+  - ipython
+  - jupyterlab
+  - matplotlib
+  - notebook
+  - numpy
+  - pandas
+  - scikit-learn
+  - ruff
+  - pytest
+  - seaborn
+  - scrapy
+  - xgboost
+  - lightgbm
+  - playwright
+  - pip:
+    - python-dotenv
+    - -e .
