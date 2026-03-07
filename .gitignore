@@ -189,3 +189,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+#Para no subir la data
+data/raw/
+data/processed/
+*.db
+*.sqlite
+.env
