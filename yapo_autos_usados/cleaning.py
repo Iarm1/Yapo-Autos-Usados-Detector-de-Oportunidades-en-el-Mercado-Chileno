@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -9,15 +10,27 @@ print(f"Registros iniciales: {len(df)}")
 df.drop(columns=['error', 'tipo_vendedor', 'direccion'], inplace=True)
 
 # ── 2. Transformaciones numéricas ─────────────────────────
-df['precio_clp'] = (df['precio_clp']
-    .astype(str)
-    .str.replace(r"[^\d]", "", regex=True)
-    .pipe(pd.to_numeric, errors='coerce'))
+def limpiar_precio(serie):
+    return (serie
+        .astype(str)
+        .str.strip()
+        .str.replace(r"\s*-[\d,\.]+%.*$", "", regex=True)  # cubre espacios y decimales en %
+            # corta -7%, -13%, etc.
+        .str.replace(",", "", regex=False)           # elimina comas como separador
+        .str.replace(r"[^\d]", "", regex=True)       # deja solo dígitos
+        .pipe(pd.to_numeric, errors='coerce'))
 
-df['kilometraje'] = (df['kilometraje']
-    .astype(str)
-    .str.replace(r"[^\d]", "", regex=True)
-    .pipe(pd.to_numeric, errors='coerce'))
+df['precio_clp'] = limpiar_precio(df['precio_clp'])
+
+
+def limpiar_km(serie):
+    return (serie
+        .astype(str)
+        .str.replace(r"['\.,\skm]", "", regex=True, flags=re.IGNORECASE)
+        .pipe(pd.to_numeric, errors='coerce'))
+
+df['kilometraje'] = limpiar_km(df['kilometraje'])
+
 
 df['año'] = pd.to_numeric(df['año'], errors='coerce')
 
@@ -59,6 +72,11 @@ print(f"Eliminados por outlier kilometraje: {antes - len(df)}")
 antes = len(df)
 df = df[df['año'].between(1990, 2026)]
 print(f"Eliminados por año fuera de rango:  {antes - len(df)}")
+# Convertir a entero nullable (soporta NaN sin convertir a float)
+df['precio_clp']  = df['precio_clp'].round(0).astype('Int64')
+df['kilometraje'] = df['kilometraje'].round(0).astype('Int64')
+df['año']         = df['año'].round(0).astype('Int64')
+df['edad_auto']   = df['edad_auto'].round(0).astype('Int64')
 
 # ── 9. Guardar ────────────────────────────────────────────
 print(f"\nRegistros finales: {len(df)}")
