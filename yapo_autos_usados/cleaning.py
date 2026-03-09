@@ -72,6 +72,25 @@ print(f"Eliminados por outlier kilometraje: {antes - len(df)}")
 antes = len(df)
 df = df[df['año'].between(1990, 2026)]
 print(f"Eliminados por año fuera de rango:  {antes - len(df)}")
+
+# 1. Normalizar transmisión
+df['transmision'] = df['transmision'].replace({'5+': 'Otros'})
+
+# 2. Normalizar región
+region_map = {
+    'region-metropolitana': 'Metropolitana',
+    'valparaiso':           'Valparaíso',
+    'biobio':               'Biobío',
+    'antofagasta':          'Antofagasta',
+    'los-lagos':            'Los Lagos'
+}
+df['region'] = df['region'].map(region_map).fillna(df['region'])
+
+# 3. Agrupar marcas pequeñas
+top_marcas = df['marca'].value_counts()
+marcas_validas = top_marcas[top_marcas >= 30].index
+df['marca'] = df['marca'].where(df['marca'].isin(marcas_validas), other='Otra')
+
 # Convertir a entero nullable (soporta NaN sin convertir a float)
 df['precio_clp']  = df['precio_clp'].round(0).astype('Int64')
 df['kilometraje'] = df['kilometraje'].round(0).astype('Int64')

@@ -2,11 +2,23 @@ import pandas as pd
 import sqlite3
 import shutil
 from pathlib import Path
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--full-reload', action='store_true')
+args = parser.parse_args()
+
+
 
 
 def run_upsert() -> None:
     ROOT = Path(__file__).resolve().parent.parent
     db_path = ROOT / "data" / "yapo.db"
+    # Si se pidió full-reload, borra la DB antes de continuar
+    if args.full_reload and db_path.exists():
+        db_path.unlink()
+        print("🗑️ DB eliminada para recarga completa")
+
 
     # 1. Cargar y sanitizar datos
     df = pd.read_csv(ROOT / "data" / "processed" / "yapo_clean.csv")
