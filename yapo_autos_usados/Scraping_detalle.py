@@ -42,19 +42,39 @@ def extraer_detalle(url, id_anuncio):
             if 'marca'  in titulo_txt: marca  = valor_txt
             elif 'modelo' in titulo_txt: modelo = valor_txt
 
-        # ── Empresa y dirección del vendedor ──
-        empresa, direccion = None, None
+        # ── Empresa, dirección y tipo vendedor ──
+        empresa, direccion, tipo_vendedor = None, None, None
+
         vendedor_tag = soup.find(class_='d3-property-contact__address-details')
         if vendedor_tag:
-            textos    = [t.strip() for t in vendedor_tag.get_text(separator='|').split('|') if t.strip()]
-            empresa   = textos[1] if len(textos) > 1 else None
-            direccion = textos[2] if len(textos) > 2 else None
+            # Nombre del publicador (siempre presente)
+            nombre_tag = vendedor_tag.find(class_='contact_name')
+            vendedor_nombre = nombre_tag.get_text(strip=True) if nombre_tag else None
 
-        # ── Tipo de vendedor ──
-        tipo_vendedor = None
-        seal = soup.find('img', alt=lambda x: x and x.strip() in ['Profesional', 'Particular'])
-        if seal:
-            tipo_vendedor = seal['alt'].lower()
+            # Todas las líneas de dirección
+            direcciones = [p.get_text(strip=True) 
+                        for p in vendedor_tag.find_all(class_='contact_address')]
+
+            if len(direcciones) >= 2:
+                # Concesionario: primera línea = empresa, segunda = dirección
+                empresa   = direcciones[0]
+                direccion = direcciones[1]
+                tipo_vendedor = 'profesional'
+            elif len(direcciones) == 1:
+                # Particular: solo hay ubicación, empresa = nombre del publicador
+                empresa   = vendedor_nombre
+                direccion = direcciones[0].lstrip('- ').strip()
+                tipo_vendedor = 'particular'
+            elif len(direcciones) == 0:
+                empresa = vendedor_nombre
+                direccion = None
+                tipo_vendedor = 'particular'
+
+            # Confirmar con sello si existe
+            sello = vendedor_tag.find('img', title=lambda x: x and x in ['Profesional', 'Particular'])
+            if sello:
+                tipo_vendedor = sello['title'].lower()
+
 
         # ── Descripción ──
         desc_tag    = soup.find(class_='d3-property-about__text')

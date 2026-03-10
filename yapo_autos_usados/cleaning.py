@@ -70,8 +70,11 @@ df = df[df['kilometraje'].between(0, 500_000)]
 print(f"Eliminados por outlier kilometraje: {antes - len(df)}")
 
 antes = len(df)
-df = df[df['año'].between(1990, 2026)]
-print(f"Eliminados por año fuera de rango:  {antes - len(df)}")
+df = df.rename(columns={'año': 'anio'})
+
+df = df[df['anio'].between(1990, 2026)]
+print(f"Eliminados por año fuera de rango: {antes - len(df)}")
+
 
 # 1. Normalizar transmisión
 df['transmision'] = df['transmision'].replace({'5+': 'Otros'})
@@ -94,7 +97,7 @@ df['marca'] = df['marca'].where(df['marca'].isin(marcas_validas), other='Otra')
 # Convertir a entero nullable (soporta NaN sin convertir a float)
 df['precio_clp']  = df['precio_clp'].round(0).astype('Int64')
 df['kilometraje'] = df['kilometraje'].round(0).astype('Int64')
-df['año']         = df['año'].round(0).astype('Int64')
+df['anio']         = df['anio'].round(0).astype('Int64')
 df['edad_auto']   = df['edad_auto'].round(0).astype('Int64')
 
 # ── 9. Guardar ────────────────────────────────────────────
