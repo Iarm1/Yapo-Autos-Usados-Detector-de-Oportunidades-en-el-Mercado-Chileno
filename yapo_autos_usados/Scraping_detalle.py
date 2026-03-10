@@ -22,6 +22,26 @@ def extraer_detalle(url, id_anuncio):
 
         soup = BeautifulSoup(resp.text, 'html.parser')
 
+        # Agrega esto ANTES del bloque de fecha/comuna
+        # ── Detectar anuncio expirado ──
+        # ── Detectar anuncio expirado ──
+        expirado_tag = soup.find(class_='exp')
+        if expirado_tag:
+            return {
+                'id':                id_anuncio,
+                'fecha_publicacion': None,
+                'comuna':            None,
+                'marca':             None,
+                'modelo':            None,
+                'empresa':           None,
+                'direccion':         None,
+                'tipo_vendedor':     'expirado',
+                'descripcion':       None,
+                'error':             'anuncio_expirado'
+            }
+
+
+
         # ── Fecha y comuna ──
         comuna, fecha_publicacion = None, None
         header_data = soup.find(class_='d3-property-info__header-data')
@@ -88,7 +108,8 @@ def extraer_detalle(url, id_anuncio):
             'modelo':            modelo,
             'empresa':           empresa,
             'direccion':         direccion,
-            'tipo_vendedor':     tipo_vendedor,
+            'tipo_vendedor': tipo_vendedor if tipo_vendedor else 'sin_info',
+
             'descripcion':       descripcion,
             'error':             None
         }
