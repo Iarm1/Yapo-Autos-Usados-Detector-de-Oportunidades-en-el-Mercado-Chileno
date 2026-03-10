@@ -7,7 +7,7 @@ df = pd.read_csv(ROOT / "data/raw/yapo_full_raw.csv")
 print(f"Registros iniciales: {len(df)}")
 
 # ── 1. Eliminar columnas inútiles ──────────────────────────
-df.drop(columns=['error', 'tipo_vendedor', 'direccion'], inplace=True)
+df.drop(columns=['error'], inplace=True)
 
 # ── 2. Transformaciones numéricas ─────────────────────────
 def limpiar_precio(serie):
