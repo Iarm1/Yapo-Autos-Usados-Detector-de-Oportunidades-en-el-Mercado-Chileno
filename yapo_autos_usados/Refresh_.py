@@ -108,6 +108,10 @@ def extraer_detalle(url, id_anuncio):
                 empresa   = vendedor_nombre
                 direccion = direcciones[0].lstrip('- ').strip()
                 tipo_vendedor = 'particular'
+            elif len(direcciones) == 0:
+                empresa = vendedor_nombre
+                direccion = None
+                tipo_vendedor = 'particular'
 
             # Confirmar con sello si existe
             sello = vendedor_tag.find('img', title=lambda x: x and x in ['Profesional', 'Particular'])
@@ -115,10 +119,6 @@ def extraer_detalle(url, id_anuncio):
                 tipo_vendedor = sello['title'].lower()
 
 
-        tipo_vendedor = None
-        seal = soup.find('img', alt=lambda x: x and x.strip() in ['Profesional', 'Particular'])
-        if seal:
-            tipo_vendedor = seal['alt'].lower()
 
         desc_tag    = soup.find(class_='d3-property-about__text')
         descripcion = desc_tag.get_text(strip=True) if desc_tag else None
@@ -127,7 +127,8 @@ def extraer_detalle(url, id_anuncio):
             'id': id_anuncio, 'fecha_publicacion': fecha_publicacion,
             'comuna': comuna, 'marca': marca, 'modelo': modelo,
             'empresa': empresa, 'direccion': direccion,
-            'tipo_vendedor': tipo_vendedor, 'descripcion': descripcion,
+            'tipo_vendedor': tipo_vendedor if tipo_vendedor else 'sin_info'
+            , 'descripcion': descripcion,
             'error': None
         }
     except Exception as e:
