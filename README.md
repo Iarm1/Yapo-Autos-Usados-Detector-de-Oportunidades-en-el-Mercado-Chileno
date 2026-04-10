@@ -59,3 +59,5 @@ Analisis de venta de autos usados Chile
 
 --------
 
+Actualizacion diaria para datos nuevos
+REFRESH_.py --> join_csv.py --> cleaning.py --> Load_sql.py(en caso de querer recargar la base de datos en sql usar --full-reload en bash)
