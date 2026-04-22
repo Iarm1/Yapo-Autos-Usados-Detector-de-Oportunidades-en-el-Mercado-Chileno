@@ -8,9 +8,9 @@ import os
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
-
-LISTING_PATH      = "data/raw/yapo_listing_raw.csv"
-DETAIL_PATH       = "data/raw/yapo_detail_raw.csv"
+BUCKET            = "yapo-autos-datalake"
+LISTING_PATH      = f"gs://{BUCKET}/raw/yapo_listing_raw.csv"
+DETAIL_PATH       = f"gs://{BUCKET}/raw/yapo_detail_raw.csv"
 API_URL           = "https://www.yapo.cl/chile-es/ajax/autos-usados"
 DELAY             = 2.0
 PAGINAS_MAX       = 60
@@ -181,7 +181,10 @@ if len(nuevos_listing) == 0:
     print("\n✓ Sin anuncios nuevos")
 else:
     print(f"\n── Pasada 2 para {len(nuevos_listing)} anuncios nuevos ──")
-    df_detail       = pd.read_csv(DETAIL_PATH) if os.path.exists(DETAIL_PATH) else pd.DataFrame()
+    try:
+        df_detail = pd.read_csv(DETAIL_PATH)
+    except FileNotFoundError:
+        df_detail = pd.DataFrame()
     ids_con_detalle = set(df_detail['id'].astype(str)) if len(df_detail) > 0 else set()
     nuevos_detail   = []
 

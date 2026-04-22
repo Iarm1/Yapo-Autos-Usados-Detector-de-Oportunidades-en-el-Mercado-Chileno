@@ -3,7 +3,8 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-df = pd.read_csv(ROOT / "data/raw/yapo_full_raw.csv")
+BUCKET = "yapo-autos-datalake"
+df = pd.read_csv(f"gs://{BUCKET}/interim/yapo_full_raw.csv")
 print(f"Registros iniciales: {len(df)}")
 
 # ── 1. Eliminar columnas inútiles ──────────────────────────
@@ -103,5 +104,5 @@ df['edad_auto']   = df['edad_auto'].round(0).astype('Int64')
 # ── 9. Guardar ────────────────────────────────────────────
 print(f"\nRegistros finales: {len(df)}")
 print(df.dtypes)
-df.to_csv(ROOT / "data/processed/yapo_clean.csv", index=False)
-print("\n✅ Guardado en data/processed/yapo_clean.csv")
+df.to_csv(f"gs://{BUCKET}/processed/yapo_clean.csv", index=False)
+print("\n✅ Guardado en gs://{BUCKET}/processed/yapo_clean.csv")

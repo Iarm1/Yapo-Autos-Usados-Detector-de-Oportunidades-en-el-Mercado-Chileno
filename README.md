@@ -59,5 +59,26 @@ Analisis de venta de autos usados Chile
 
 --------
 
-Actualizacion diaria para datos nuevos
+Actualizacion diaria para datos nuevos en local
 REFRESH_.py --> join_csv.py --> cleaning.py --> Load_sql.py(en caso de querer recargar la base de datos en sql usar --full-reload en bash)
+
+# Detector de Oportunidades en Yapo Autos (Mercado Chileno)
+
+## Resumen del Proyecto
+Este proyecto automatiza la extracción, limpieza y almacenamiento de anuncios de autos usados en Chile. Su objetivo es detectar oportunidades de mercado (autos subvalorados) alimentando un dashboard analítico.
+
+## Arquitectura de Datos (Modern Data Stack)
+El proyecto pasó de una ejecución local a una arquitectura Cloud 100% serverless en Google Cloud Platform (GCP):
+
+1. **Extracción y Limpieza (Python + Pandas):** Scripts que extraen datos usando BeautifulSoup y procesan DataFrames.
+2. **Orquestación (Cloud Scheduler):** Gatilla el proceso todos los días a las 8:00 AM (Hora Chile).
+3. **Cómputo (Cloud Run + Docker):** El código se empaqueta en un contenedor Docker y se ejecuta de forma efímera y escalable.
+4. **Data Lake (Cloud Storage):** Almacena las capas de datos `raw`, `interim` y `processed` como respaldo histórico.
+5. **Data Warehouse (BigQuery):** Carga incremental mediante operaciones `MERGE` (Upsert) garantizando datos únicos y limpios.
+6. **Visualización (Power BI):** (En desarrollo) Conexión en modo Import para análisis diario.
+
+## Tecnologías Utilizadas
+* **Lenguaje:** Python 3.10
+* **Contenedores:** Docker, Google Artifact Registry
+* **GCP:** Cloud Run Jobs, Cloud Scheduler, Cloud Storage, BigQuery
+* **Librerías clave:** `pandas`, `pandas-gbq`, `beautifulsoup4`, `gcsfs`
